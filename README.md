@@ -1,1 +1,1 @@
-# eventos-participantes-certificacion
+# (E)ventos-(Pa)rticipantes-(Ce)rtificacion
