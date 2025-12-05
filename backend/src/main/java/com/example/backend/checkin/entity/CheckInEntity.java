@@ -1,5 +1,6 @@
 package com.example.backend.checkin.entity;
 
+import com.example.backend.participacion.entity.ParticipacionEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

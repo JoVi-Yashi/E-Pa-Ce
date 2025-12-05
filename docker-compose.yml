@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18
+    container_name: epace-postgres
+    environment:
+      POSTGRES_DB: EPaCe
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PS8289
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: epace-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: EPaCe
+      DB_USERNAME: postgres
+      DB_PASSWORD: PS8289
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    container_name: epace-frontend
+    ports:
+      - "5173:80"   # Accedes desde: http://localhost:5173
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

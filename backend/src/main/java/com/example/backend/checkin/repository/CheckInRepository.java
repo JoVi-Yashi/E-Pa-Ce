@@ -42,7 +42,10 @@ public interface CheckInRepository extends JpaRepository<CheckInEntity, Integer>
     /**
      * Busca check-ins por método (QR o MANUAL).
      */
-    List<CheckInEntity> findByMetodoCheckIn(String metodoCheckIn);
+
+
+    @Query("SELECT c FROM CheckInEntity c WHERE c.metodoCheckIn = :metodo")
+    List<CheckInEntity> findByMetodoCheckIn(@Param("metodo") String metodo);
 
     /**
      * Busca check-ins en un rango de fechas.

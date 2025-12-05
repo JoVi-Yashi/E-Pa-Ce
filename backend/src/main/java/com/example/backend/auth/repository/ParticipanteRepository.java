@@ -1,6 +1,7 @@
-package com.example.backend.participante.repository;
+package com.example.backend.auth.repository;
 
-import com.example.backend.participante.entity.ParticipanteEntity;
+
+import com.example.backend.auth.entity.ParticipanteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

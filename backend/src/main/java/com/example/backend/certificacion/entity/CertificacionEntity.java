@@ -1,6 +1,7 @@
 package com.example.backend.certificacion.entity;
 
 
+import com.example.backend.participacion.entity.ParticipacionEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +24,9 @@ public class CertificacionEntity {
     @Column(name = "ID_Certificacion", nullable = false)
     private Integer idCertificacion;
 
+    @Column(name = "Codigo_Unico_API", length = 50, unique = true)
+    private String codigoUnicoAPI;
+
     @Column(name = "Fecha_Emision")
     private LocalDateTime fechaEmision;
 
@@ -33,9 +37,6 @@ public class CertificacionEntity {
     @Column(name = "Emitido")
     private Boolean emitido;
 
-    @Size(max = 40, message = "El código único API no puede exceder 40 caracteres")
-    @Column(name = "Codigo_UnicoAPI", length = 40)
-    private String codigoUnicoAPI;
 
     @NotNull(message = "La participación es obligatoria")
     @OneToOne(fetch = FetchType.LAZY)

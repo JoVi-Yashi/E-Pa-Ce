@@ -1,5 +1,6 @@
 package com.example.backend.auditoria.entity;
 
+import com.example.backend.auth.entity.ParticipanteEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

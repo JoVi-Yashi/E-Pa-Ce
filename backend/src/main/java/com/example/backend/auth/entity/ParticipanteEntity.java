@@ -1,5 +1,7 @@
-package com.example.backend.participante.entity;
+package com.example.backend.auth.entity;
 
+
+import com.example.backend.rol.entity.RolEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -85,44 +87,34 @@ public class ParticipanteEntity implements UserDetails {
         this.rol = rol;
     }
 
-    // ==========================================================
-    // MÉTODOS REQUERIDOS POR UserDetails (Implementación)
-    // ==========================================================
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.rol == null) {
-            return List.of();
-        }
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.rol.getNombreRol().toUpperCase()));
-    }
 
     @Override
-    public String getPassword() {
-        return this.password;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 
     @Override
     public String getUsername() {
-        return this.email;
+        return "";
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return false;
     }
 }
