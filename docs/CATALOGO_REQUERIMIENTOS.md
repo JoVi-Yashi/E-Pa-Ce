@@ -7,7 +7,7 @@
 | **Proyecto**    | E-Pa-Ce - Sistema Integral de Gestión de Eventos |
 | **Versión**     | 1.0.0                                            |
 | **Fecha**       | 2025-11-24                                       |
-| **Tecnologías** | Go (Gin + GORM), Vue.js, PostgreSQL              |
+| **Tecnologías** | Java (SpringBoot), Vue.js, PostgreSQL            |
 
 ---
 
