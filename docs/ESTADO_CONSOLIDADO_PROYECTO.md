@@ -7,7 +7,7 @@ Este documento consolida y resume toda la información esencial sobre el proyect
 ## 🎯 VISIÓN GENERAL DEL PROYECTO
 
 **Sistema**: E-Pa-Ce (Eventos-Participantes-Certificación)  
-**Estado Actual**: ~35-45% completado  
+**Estado Actual**: ~30-35% completado  
 **Esfuerzo Restante Estimado**: 4-6 semanas de desarrollo a tiempo completo  
 **Componentes Principales**: Backend Spring Boot, Frontend Vue.js, Base de Datos PostgreSQL  
 
@@ -18,25 +18,47 @@ Este documento consolida y resume toda la información esencial sobre el proyect
 ### ✅ Elementos Completados
 - Esquema de base de datos completamente definido en PostgreSQL
 - Estructura básica del backend con Spring Boot
-- Clases de entidad para todos los módulos requeridos
-- Sistema de autenticación con infraestructura JWT
+- Clases de entidad para todos los módulos requeridos (aunque algunas tienen problemas)
+- Sistema de autenticación parcialmente implementado con infraestructura JWT
 - Configuración Docker para despliegue
 - Esqueleto del frontend con Vue.js
 - Documentación completa (requerimientos, modelo, etc.)
 
 ### ⚠️ Problemas Críticos Identificados
-1. **Entidades Duplicadas**: Existen múltiples versiones de las mismas entidades
-2. **Repositorios Faltantes**: Se necesitan crear 9 interfaces de repositorio
-3. **Servicios Incompletos**: Solo se implementó el servicio básico de autenticación
-4. **Controladores Faltantes**: Los endpoints de API están en gran parte sin implementar
-5. **Frontend Solo Esquelético**: Sin funcionalidad real implementada
+1. **Entidades Duplicadas RESUELTO**: El archivo `AuditoriaEntity.java` fue eliminado de `backend/src/main/resources/`
+2. **Repositorios Parcialmente Implementados**: Algunos repositorios tienen métodos de consulta personalizados (EventoRepository, ParticipanteRepository) mientras que otros son repositorios JPA básicos (RolRepository)
+3. **Servicios Vacíos**: Las interfaces y implementaciones de servicios existen pero son estructuras vacías sin lógica de negocio
+4. **Controladores Vacíos**: Las clases controladoras existen pero son estructuras vacías sin endpoints REST
+5. **Frontend Solo Esquelético**: Contiene solo la plantilla predeterminada de Vue.js sin componentes o funcionalidad específica de la aplicación
 
 ### ❌ Componentes Principales Faltantes
-- Implementación de API backend (controladores, servicios, DTOs)
-- Funcionalidad del frontend (componentes, enrutamiento, integración)
-- Pruebas completas
-- Documentación de API
-- Manejo adecuado de errores
+
+#### Backend API (Controladores, Servicios, DTOs)
+- **Controladores**: Las clases controladoras existen pero son estructuras vacías sin endpoints REST implementados
+- **Servicios**: Las interfaces y implementaciones de servicios existen pero no contienen lógica de negocio
+- **DTOs**: Solo existen DTOs básicos de autenticación con campos definidos (LoginRequest, SignupRequest, JwtResponse); faltan DTOs para todas las demás operaciones y los DTOs existentes para otras operaciones están vacíos
+- **Endpoints**: No hay endpoints REST implementados para ninguna funcionalidad excepto la estructura básica de autenticación
+
+#### Frontend (Componentes, Enrutamiento, Integración)
+- **Componentes UI**: Solo existe un esqueleto básico de Vue; faltan componentes completos para formularios, listados, tarjetas, etc.
+- **Enrutamiento**: El enrutador está vacío; se necesita configurar rutas completas para todas las vistas
+- **Integración API**: No hay integración con el backend; se necesitan servicios para comunicarse con los endpoints
+- **Vistas**: Faltan vistas completas para login, registro, dashboard, gestión de eventos, perfil de usuario
+
+#### Pruebas Completas
+- **Pruebas Unitarias**: No existen pruebas unitarias para servicios o controladores
+- **Pruebas de Integración**: No hay pruebas que verifiquen la integración entre componentes
+- **Pruebas E2E**: No existen pruebas de extremo a extremo para flujos de usuario críticos
+
+#### Documentación de API
+- **Swagger/OpenAPI**: No hay documentación interactiva de la API
+- **Ejemplos de Uso**: Faltan ejemplos detallados de cómo usar cada endpoint
+- **Referencia de Parámetros**: No existe documentación completa de parámetros y respuestas
+
+#### Manejo Adecuado de Errores
+- **Manejo Global de Excepciones**: No hay un sistema centralizado para manejar errores
+- **Validaciones**: Faltan validaciones de entrada en controladores y servicios
+- **Mensajes de Error Claros**: Los mensajes de error no son descriptivos ni amigables para el usuario
 
 ---
 
@@ -186,10 +208,8 @@ src/
 ## ⚠️ ELEMENTOS DE ACCIÓN INMEDIATA
 
 ### Tareas Críticas de Limpieza:
-1. **Eliminar Entidades Duplicadas**:
-   - Eliminar `UsuarioEntity.java` (duplicado de `ParticipanteEntity.java`)
-   - Eliminar `RolesEntity.java` (duplicado de `RolEntity.java`)
-   - Eliminar `CertificacionesEntity.java` (duplicado de `CertificacionEntity.java`)
+1. **Eliminar Entidades Duplicadas RESUELTO**:
+   - El archivo `backend/src/main/resources/AuditoriaEntity.java` fue eliminado
 
 2. **Crear Repositorios Faltantes** (9 interfaces):
    - `ParticipanteRepository.java`

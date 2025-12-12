@@ -20,7 +20,7 @@ public class RolEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_Rol", nullable = false)
-    private Short idRol;
+    private Integer idRol;
 
     @NotBlank(message = "El nombre del rol es obligatorio")
     @Size(max = 20, message = "El nombre del rol no puede exceder 20 caracteres")
@@ -30,9 +30,8 @@ public class RolEntity {
     public RolEntity() {
     }
 
-    public RolEntity(Short idRol, String nombreRol) {
+    public RolEntity(Integer idRol, String nombreRol) {
         this.idRol = idRol;
         this.nombreRol = nombreRol;
     }
 }
-

@@ -1,4 +1,66 @@
 package com.example.backend.rol;
 
-public class RolServiceImpl {
+import com.example.backend.rol.dto.RolDTO;
+import com.example.backend.rol.entity.RolEntity;
+import com.example.backend.rol.repository.RolRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class RolServiceImpl implements RolService {
+
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<RolDTO> getAllRoles() {
+        return rolRepository.findAll().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RolDTO getRolById(Integer id) {
+        RolEntity rol = rolRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + id));
+        return mapToDTO(rol);
+    }
+
+    @Override
+    @Transactional
+    public RolDTO createRol(RolDTO rolDTO) {
+        RolEntity rol = new RolEntity();
+        rol.setNombreRol(rolDTO.getNombreRol());
+        RolEntity saved = rolRepository.save(rol);
+        return mapToDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public RolDTO updateRol(Integer id, RolDTO rolDTO) {
+        RolEntity rol = rolRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + id));
+        rol.setNombreRol(rolDTO.getNombreRol());
+        RolEntity updated = rolRepository.save(rol);
+        return mapToDTO(updated);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRol(Integer id) {
+        if (!rolRepository.existsById(id)) {
+            throw new RuntimeException("Rol no encontrado con ID: " + id);
+        }
+        rolRepository.deleteById(id);
+    }
+
+    private RolDTO mapToDTO(RolEntity entity) {
+        return new RolDTO(entity.getIdRol(), entity.getNombreRol());
+    }
 }
