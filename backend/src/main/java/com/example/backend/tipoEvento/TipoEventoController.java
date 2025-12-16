@@ -5,13 +5,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tipos-evento")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class TipoEventoController {
 
     @Autowired
@@ -23,7 +22,7 @@ public class TipoEventoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TipoEventoDTO> getTipoEventoById(@PathVariable Integer id) {
+    public ResponseEntity<TipoEventoDTO> getTipoEventoById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(tipoEventoService.getTipoEventoById(id));
         } catch (RuntimeException e) {
@@ -37,7 +36,7 @@ public class TipoEventoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TipoEventoDTO> updateTipoEvento(@PathVariable Integer id,
+    public ResponseEntity<TipoEventoDTO> updateTipoEvento(@PathVariable @NonNull Integer id,
             @Valid @RequestBody TipoEventoDTO tipoEventoDTO) {
         try {
             return ResponseEntity.ok(tipoEventoService.updateTipoEvento(id, tipoEventoDTO));
@@ -47,7 +46,7 @@ public class TipoEventoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTipoEvento(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteTipoEvento(@PathVariable @NonNull Integer id) {
         try {
             tipoEventoService.deleteTipoEvento(id);
             return ResponseEntity.noContent().build();

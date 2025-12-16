@@ -6,13 +6,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/participaciones")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class ParticipacionController {
 
     @Autowired
@@ -24,7 +23,7 @@ public class ParticipacionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ParticipacionResponse> getParticipacionById(@PathVariable Integer id) {
+    public ResponseEntity<ParticipacionResponse> getParticipacionById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(participacionService.getParticipacionById(id));
         } catch (RuntimeException e) {
@@ -42,7 +41,7 @@ public class ParticipacionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteParticipacion(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteParticipacion(@PathVariable @NonNull Integer id) {
         try {
             participacionService.deleteParticipacion(id);
             return ResponseEntity.noContent().build();
@@ -52,12 +51,12 @@ public class ParticipacionController {
     }
 
     @GetMapping("/evento/{eventoId}")
-    public ResponseEntity<List<ParticipacionResponse>> getByEvento(@PathVariable Integer eventoId) {
+    public ResponseEntity<List<ParticipacionResponse>> getByEvento(@PathVariable @NonNull Integer eventoId) {
         return ResponseEntity.ok(participacionService.getParticipacionesByEvento(eventoId));
     }
 
     @GetMapping("/participante/{documento}")
-    public ResponseEntity<List<ParticipacionResponse>> getByParticipante(@PathVariable Long documento) {
+    public ResponseEntity<List<ParticipacionResponse>> getByParticipante(@PathVariable @NonNull Long documento) {
         return ResponseEntity.ok(participacionService.getParticipacionesByParticipante(documento));
     }
 }

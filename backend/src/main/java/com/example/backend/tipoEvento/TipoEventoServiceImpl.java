@@ -6,6 +6,7 @@ import com.example.backend.tipoEvento.repository.TipoEventoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class TipoEventoServiceImpl implements TipoEventoService {
 
     @Override
     @Transactional(readOnly = true)
-    public TipoEventoDTO getTipoEventoById(Integer id) {
+    public TipoEventoDTO getTipoEventoById(@NonNull Integer id) {
         TipoEventoEntity tipoEvento = tipoEventoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tipo de evento no encontrado con ID: " + id));
         return mapToDTO(tipoEvento);
@@ -43,7 +44,7 @@ public class TipoEventoServiceImpl implements TipoEventoService {
 
     @Override
     @Transactional
-    public TipoEventoDTO updateTipoEvento(Integer id, TipoEventoDTO tipoEventoDTO) {
+    public TipoEventoDTO updateTipoEvento(@NonNull Integer id, TipoEventoDTO tipoEventoDTO) {
         TipoEventoEntity tipoEvento = tipoEventoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tipo de evento no encontrado con ID: " + id));
         tipoEvento.setNombreTipoEvento(tipoEventoDTO.getNombreTipoEvento());
@@ -53,7 +54,7 @@ public class TipoEventoServiceImpl implements TipoEventoService {
 
     @Override
     @Transactional
-    public void deleteTipoEvento(Integer id) {
+    public void deleteTipoEvento(@NonNull Integer id) {
         if (!tipoEventoRepository.existsById(id)) {
             throw new RuntimeException("Tipo de evento no encontrado con ID: " + id);
         }

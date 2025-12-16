@@ -6,6 +6,7 @@ import com.example.backend.rol.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class RolServiceImpl implements RolService {
 
     @Override
     @Transactional(readOnly = true)
-    public RolDTO getRolById(Integer id) {
+    public RolDTO getRolById(@NonNull Integer id) {
         RolEntity rol = rolRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + id));
         return mapToDTO(rol);
@@ -37,23 +38,25 @@ public class RolServiceImpl implements RolService {
     public RolDTO createRol(RolDTO rolDTO) {
         RolEntity rol = new RolEntity();
         rol.setNombreRol(rolDTO.getNombreRol());
+        rol.setPermisos(rolDTO.getPermisos());
         RolEntity saved = rolRepository.save(rol);
         return mapToDTO(saved);
     }
 
     @Override
     @Transactional
-    public RolDTO updateRol(Integer id, RolDTO rolDTO) {
+    public RolDTO updateRol(@NonNull Integer id, RolDTO rolDTO) {
         RolEntity rol = rolRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + id));
         rol.setNombreRol(rolDTO.getNombreRol());
+        rol.setPermisos(rolDTO.getPermisos());
         RolEntity updated = rolRepository.save(rol);
         return mapToDTO(updated);
     }
 
     @Override
     @Transactional
-    public void deleteRol(Integer id) {
+    public void deleteRol(@NonNull Integer id) {
         if (!rolRepository.existsById(id)) {
             throw new RuntimeException("Rol no encontrado con ID: " + id);
         }
@@ -61,6 +64,6 @@ public class RolServiceImpl implements RolService {
     }
 
     private RolDTO mapToDTO(RolEntity entity) {
-        return new RolDTO(entity.getIdRol(), entity.getNombreRol());
+        return new RolDTO(entity.getIdRol(), entity.getNombreRol(), entity.getPermisos());
     }
 }

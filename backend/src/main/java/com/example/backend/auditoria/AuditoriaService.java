@@ -2,6 +2,7 @@ package com.example.backend.auditoria;
 
 import com.example.backend.auditoria.dto.AuditoriaResponse;
 
+import org.springframework.lang.NonNull;
 import java.util.List;
 
 public interface AuditoriaService {
@@ -9,5 +10,5 @@ public interface AuditoriaService {
 
     List<AuditoriaResponse> getAllLogs();
 
-    List<AuditoriaResponse> getLogsByParticipante(Long usuarioId);
+    List<AuditoriaResponse> getLogsByParticipante(@NonNull Long usuarioId);
 }

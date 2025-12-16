@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Entidad que representa un participante del sistema.
@@ -30,8 +29,7 @@ import java.util.List;
 @DynamicUpdate
 @Entity
 @Table(name = "Participantes", indexes = {
-        @Index(name = "idx_participante_email", columnList = "Email"),
-        @Index(name = "idx_participante_rol", columnList = "RolID_Rol")
+        @Index(name = "idx_participante_email", columnList = "Email")
 }, uniqueConstraints = {
         @UniqueConstraint(name = "uk_participante_email", columnNames = "Email")
 })
@@ -68,30 +66,33 @@ public class ParticipanteEntity implements UserDetails {
     @Column(name = "Fecha_Creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
-    @NotNull(message = "El rol es obligatorio")
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "RolID_Rol", nullable = false, foreignKey = @ForeignKey(name = "fk_participante_rol"))
-    private RolEntity rol;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "Participante_Roles", joinColumns = @JoinColumn(name = "Participante_Documento"), inverseJoinColumns = @JoinColumn(name = "Rol_ID"))
+    private java.util.Set<RolEntity> roles = new java.util.HashSet<>();
 
     public ParticipanteEntity() {
     }
 
     public ParticipanteEntity(Long documentoIdentidad, String nombre, String apellido, String email, String password,
-            RolEntity rol) {
+            java.util.Set<RolEntity> roles) {
         this.documentoIdentidad = documentoIdentidad;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
         this.password = password;
-        this.rol = rol;
+        this.roles = roles;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (this.rol != null) {
-            return List.of(new SimpleGrantedAuthority(this.rol.getNombreRol()));
+        java.util.List<GrantedAuthority> authorities = new java.util.ArrayList<>();
+        for (RolEntity rol : roles) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + rol.getNombreRol())); // Add Role
+            for (String permiso : rol.getPermisos()) {
+                authorities.add(new SimpleGrantedAuthority(permiso)); // Add Permissions
+            }
         }
-        return List.of();
+        return authorities;
     }
 
     @Override

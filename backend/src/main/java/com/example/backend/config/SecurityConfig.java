@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,6 +23,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    public SecurityConfig() {
+        System.out.println("Security Config loaded");
+    }
 
     @Autowired
     UserDetailsService userDetailsService;
@@ -48,12 +53,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/test/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/certificaciones/verificar/**")
+                        .permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated());
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -66,8 +73,14 @@ public class SecurityConfig {
 
         var cors = new org.springframework.web.cors.CorsConfiguration();
 
-        cors.addAllowedOrigin("http://localhost:5173"); // VUE localhost (Vite)
-        cors.addAllowedOrigin("http://localhost:8081"); // Si lo usas en otro puerto
+        cors.setAllowedOriginPatterns(java.util.List.of(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:4173",
+                "http://localhost:3000",
+                "http://localhost:8081",
+                "*" // For development convenience, though typically restricted in prod
+        ));
 
         cors.addAllowedMethod("*");
         cors.addAllowedHeader("*");

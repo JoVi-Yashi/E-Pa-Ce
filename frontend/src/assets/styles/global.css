@@ -1,0 +1,266 @@
+/* Premium Global Styles */
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+  --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+  --dark-bg: #1a1c23;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0f2f5;
+  /* Subtle mesh gradient background */
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-weight: 700;
+  color: #1a202c;
+  letter-spacing: -0.025em;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: var(--primary-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+h2 {
+  font-size: 2rem;
+}
+h3 {
+  font-size: 1.5rem;
+}
+
+/* High visibility back link */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  color: #4a5568 !important; /* Force color */
+  border: 1px solid #cbd5e0;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.back-link:hover {
+  background-color: #f7fafc;
+  color: #2d3748 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Form Inputs */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: white;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Generic Button Styling (Matches BaseButton) */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow:
+    0 4px 6px rgba(50, 50, 93, 0.11),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 7px 14px rgba(50, 50, 93, 0.1),
+    0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Specific button variants can be applied via classes if needed, but this covers defaults */
+
+/* Premium Table Styling */
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  margin: 1.5rem 0;
+}
+
+.styled-table th,
+.styled-table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+}
+
+.styled-table th {
+  background: #f8fafc;
+  color: #4a5568;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.styled-table tr:last-child td {
+  border-bottom: none;
+}
+
+.styled-table tr td {
+  border-bottom: 1px solid #edf2f7;
+  color: #4a5568;
+}
+
+.styled-table tr:hover td {
+  background-color: #f7fafc;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Container Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Glass Title Component for High Contrast */
+.glass-header {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  display: inline-block;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 0; 
+}
+
+.glass-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.2;
+}
+
+/* Modal Enhancements */
+.modal-content {
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.styled-table th {
+  background: rgba(248, 250, 252, 0.8); /* Slightly transparent header */
+}
+
+/* Navbar Hover Crystal Effect */
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure text doesn't blend with background in cards either */
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Input Auto-fill fix for dark modes if we ever go there, but right now ensuring white bg */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}

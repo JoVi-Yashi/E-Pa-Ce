@@ -1,8 +1,7 @@
 package com.example.backend.rol.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,16 +21,34 @@ public class RolEntity {
     @Column(name = "ID_Rol", nullable = false)
     private Integer idRol;
 
-    @NotBlank(message = "El nombre del rol es obligatorio")
-    @Size(max = 20, message = "El nombre del rol no puede exceder 20 caracteres")
-    @Column(name = "Nombre_Rol", nullable = false, length = 20)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "Rol_Permisos", joinColumns = @JoinColumn(name = "rol_id"))
+    @Column(name = "permiso")
+    private java.util.Set<String> permisos = new java.util.HashSet<>();
+
+    @Column(name = "Nombre_Rol", length = 50, unique = true)
     private String nombreRol;
 
     public RolEntity() {
     }
 
-    public RolEntity(Integer idRol, String nombreRol) {
-        this.idRol = idRol;
+    public RolEntity(String nombreRol) {
         this.nombreRol = nombreRol;
+    }
+
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+    public java.util.Set<String> getPermisos() {
+        return permisos;
+    }
+
+    public void setPermisos(java.util.Set<String> permisos) {
+        this.permisos = permisos;
     }
 }

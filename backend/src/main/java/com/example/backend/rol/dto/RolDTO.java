@@ -13,4 +13,6 @@ public class RolDTO {
 
     @NotBlank(message = "El nombre del rol es obligatorio")
     private String nombreRol;
+
+    private java.util.Set<String> permisos;
 }

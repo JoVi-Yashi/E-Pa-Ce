@@ -6,6 +6,7 @@ import com.example.backend.auth.dto.SignupRequest;
 import com.example.backend.auth.entity.ParticipanteEntity;
 import com.example.backend.auth.repository.ParticipanteRepository;
 import com.example.backend.config.jwt.JwtUtils;
+import com.example.backend.rol.entity.AppRole;
 import com.example.backend.rol.entity.RolEntity;
 import com.example.backend.rol.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,18 +79,37 @@ public class AuthServiceImpl implements AuthService {
         participante.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
 
         // Asignar rol
-        Integer rolId = signupRequest.getRolId();
-        if (rolId == null) {
-            // Default role: INVITADO (Asumiendo ID 3 por ejemplo, o buscando por nombre)
-            // Mejor buscar por nombre si es posible, o ID 1 si es el default
-            RolEntity userRole = rolRepository.findByNombreRol("INVITADO")
+        // Asignar roles
+        java.util.Set<String> strRoles = signupRequest.getRoles();
+        java.util.Set<RolEntity> roles = new java.util.HashSet<>();
+
+        if (strRoles == null || strRoles.isEmpty()) {
+            RolEntity userRole = rolRepository.findByNombreRol(AppRole.INVITADO.name())
                     .orElseThrow(() -> new RuntimeException("Error: Rol INVITADO no encontrado."));
-            participante.setRol(userRole);
+            roles.add(userRole);
         } else {
-            RolEntity rol = rolRepository.findById(rolId)
-                    .orElseThrow(() -> new RuntimeException("Error: Rol no encontrado."));
-            participante.setRol(rol);
+            strRoles.forEach(role -> {
+                switch (role.toLowerCase()) {
+                    case "admin":
+                        RolEntity adminRole = rolRepository.findByNombreRol(AppRole.ADMIN.name())
+                                .orElseThrow(() -> new RuntimeException("Error: Rol ADMIN no encontrado."));
+                        roles.add(adminRole);
+                        break;
+                    case "organizador":
+                        RolEntity modRole = rolRepository.findByNombreRol(AppRole.ORGANIZADOR.name())
+                                .orElseThrow(() -> new RuntimeException("Error: Rol ORGANIZADOR no encontrado."));
+                        roles.add(modRole);
+                        break;
+                    default:
+                        // Try to find the role by name directly if it exists, matching dynamic roles
+                        RolEntity userRole = rolRepository.findByNombreRol(role.toUpperCase())
+                                .orElseGet(() -> rolRepository.findByNombreRol(AppRole.USER.name())
+                                        .orElseThrow(() -> new RuntimeException("Error: Rol USER no encontrado.")));
+                        roles.add(userRole);
+                }
+            });
         }
+        participante.setRoles(roles);
 
         participanteRepository.save(participante);
 

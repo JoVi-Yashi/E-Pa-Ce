@@ -1,6 +1,5 @@
 package com.example.backend.auth.dto;
 
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +19,8 @@ public class SignupRequest {
     @Size(max = 25)
     private String apellido;
 
-    @NotBlank @Email
+    @NotBlank
+    @Email
     @Size(max = 45)
     private String email;
 
@@ -28,5 +28,5 @@ public class SignupRequest {
     @Size(min = 6, message = "La contraseÃ±a debe tener al menos 6 caracteres")
     private String password;
 
-    private Integer rolId;  // Opcional, por defecto serÃ¡ INVITADO
+    private java.util.Set<String> roles;
 }

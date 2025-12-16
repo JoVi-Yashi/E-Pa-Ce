@@ -5,13 +5,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/modalidades")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class ModalidadEventoController {
 
     @Autowired
@@ -23,7 +22,7 @@ public class ModalidadEventoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ModalidadEventoDTO> getModalidadById(@PathVariable Integer id) {
+    public ResponseEntity<ModalidadEventoDTO> getModalidadById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(modalidadEventoService.getModalidadById(id));
         } catch (RuntimeException e) {
@@ -37,7 +36,7 @@ public class ModalidadEventoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ModalidadEventoDTO> updateModalidad(@PathVariable Integer id,
+    public ResponseEntity<ModalidadEventoDTO> updateModalidad(@PathVariable @NonNull Integer id,
             @Valid @RequestBody ModalidadEventoDTO modalidadDTO) {
         try {
             return ResponseEntity.ok(modalidadEventoService.updateModalidad(id, modalidadDTO));
@@ -47,7 +46,7 @@ public class ModalidadEventoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteModalidad(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteModalidad(@PathVariable @NonNull Integer id) {
         try {
             modalidadEventoService.deleteModalidad(id);
             return ResponseEntity.noContent().build();

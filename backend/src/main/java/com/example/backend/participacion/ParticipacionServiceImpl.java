@@ -11,6 +11,7 @@ import com.example.backend.participacion.repository.ParticipacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.lang.NonNull;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ParticipacionServiceImpl implements ParticipacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public ParticipacionResponse getParticipacionById(Integer id) {
+    public ParticipacionResponse getParticipacionById(@NonNull Integer id) {
         ParticipacionEntity participacion = participacionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Participación no encontrada con ID: " + id));
         return mapToResponse(participacion);
@@ -48,11 +49,14 @@ public class ParticipacionServiceImpl implements ParticipacionService {
     @Override
     @Transactional
     public ParticipacionResponse createParticipacion(ParticipacionRequest request) {
-        ParticipanteEntity participante = participanteRepository.findById(request.getParticipanteDocumento())
+        ParticipanteEntity participante = participanteRepository
+                .findById(java.util.Objects.requireNonNull(request.getParticipanteDocumento(),
+                        "El documento del participante es requerido"))
                 .orElseThrow(() -> new RuntimeException(
                         "Participante no encontrado con documento: " + request.getParticipanteDocumento()));
 
-        EventoEntity evento = eventoRepository.findById(request.getEventoId())
+        EventoEntity evento = eventoRepository
+                .findById(java.util.Objects.requireNonNull(request.getEventoId(), "El ID del evento es requerido"))
                 .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + request.getEventoId()));
 
         ParticipacionEntity participacion = new ParticipacionEntity();
@@ -67,7 +71,7 @@ public class ParticipacionServiceImpl implements ParticipacionService {
 
     @Override
     @Transactional
-    public void deleteParticipacion(Integer id) {
+    public void deleteParticipacion(@NonNull Integer id) {
         if (!participacionRepository.existsById(id)) {
             throw new RuntimeException("Participación no encontrada con ID: " + id);
         }
@@ -76,7 +80,7 @@ public class ParticipacionServiceImpl implements ParticipacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ParticipacionResponse> getParticipacionesByEvento(Integer eventoId) {
+    public List<ParticipacionResponse> getParticipacionesByEvento(@NonNull Integer eventoId) {
         return participacionRepository.findAll().stream()
                 .filter(p -> p.getEvento().getIdEvento().equals(eventoId))
                 .map(this::mapToResponse)
@@ -85,7 +89,7 @@ public class ParticipacionServiceImpl implements ParticipacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ParticipacionResponse> getParticipacionesByParticipante(Long documento) {
+    public List<ParticipacionResponse> getParticipacionesByParticipante(@NonNull Long documento) {
         return participacionRepository.findAll().stream()
                 .filter(p -> p.getParticipante().getDocumentoIdentidad().equals(documento))
                 .map(this::mapToResponse)

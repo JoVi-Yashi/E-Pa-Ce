@@ -1,6 +1,5 @@
 package com.example.backend.auth.repository;
 
-
 import com.example.backend.auth.entity.ParticipanteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,7 +34,7 @@ public interface ParticipanteRepository extends JpaRepository<ParticipanteEntity
     /**
      * Busca participantes por rol.
      */
-    List<ParticipanteEntity> findByRol_IdRol(Integer idRol);
+    List<ParticipanteEntity> findByRoles_IdRol(Integer idRol);
 
     /**
      * Busca participantes cuyo nombre o apellido contenga el texto dado
@@ -49,6 +48,6 @@ public interface ParticipanteRepository extends JpaRepository<ParticipanteEntity
     /**
      * Cuenta los participantes por rol.
      */
-    @Query("SELECT COUNT(p) FROM ParticipanteEntity p WHERE p.rol.idRol = :rolId")
+    @Query("SELECT COUNT(p) FROM ParticipanteEntity p JOIN p.roles r WHERE r.idRol = :rolId")
     Long countByRolId(@Param("rolId") Integer rolId);
 }

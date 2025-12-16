@@ -7,6 +7,7 @@ import com.example.backend.auth.entity.ParticipanteEntity;
 import com.example.backend.auth.repository.ParticipanteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -50,7 +51,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AuditoriaResponse> getLogsByParticipante(Long usuarioId) {
+    public List<AuditoriaResponse> getLogsByParticipante(@NonNull Long usuarioId) {
         return auditoriaRepository.findByParticipante_DocumentoIdentidad(usuarioId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

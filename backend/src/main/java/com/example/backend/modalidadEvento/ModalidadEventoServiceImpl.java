@@ -4,6 +4,7 @@ import com.example.backend.modalidadEvento.dto.ModalidadEventoDTO;
 import com.example.backend.modalidadEvento.entity.ModalidadEventoEntity;
 import com.example.backend.modalidadEvento.repository.ModalidadEventoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class ModalidadEventoServiceImpl implements ModalidadEventoService {
 
     @Override
     @Transactional(readOnly = true)
-    public ModalidadEventoDTO getModalidadById(Integer id) {
+    public ModalidadEventoDTO getModalidadById(@NonNull Integer id) {
         ModalidadEventoEntity modalidad = modalidadEventoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Modalidad no encontrada con ID: " + id));
         return mapToDTO(modalidad);
@@ -43,7 +44,7 @@ public class ModalidadEventoServiceImpl implements ModalidadEventoService {
 
     @Override
     @Transactional
-    public ModalidadEventoDTO updateModalidad(Integer id, ModalidadEventoDTO modalidadDTO) {
+    public ModalidadEventoDTO updateModalidad(@NonNull Integer id, ModalidadEventoDTO modalidadDTO) {
         ModalidadEventoEntity modalidad = modalidadEventoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Modalidad no encontrada con ID: " + id));
         modalidad.setNombreModalidadEvento(modalidadDTO.getNombreModalidadEvento());
@@ -53,7 +54,7 @@ public class ModalidadEventoServiceImpl implements ModalidadEventoService {
 
     @Override
     @Transactional
-    public void deleteModalidad(Integer id) {
+    public void deleteModalidad(@NonNull Integer id) {
         if (!modalidadEventoRepository.existsById(id)) {
             throw new RuntimeException("Modalidad no encontrada con ID: " + id);
         }

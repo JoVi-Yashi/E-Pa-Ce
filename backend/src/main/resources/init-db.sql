@@ -6,13 +6,18 @@
 -- 1. Inserción de ROLES
 -- =====================================================
 -- Los roles definen los niveles de acceso en el sistema
+-- DEBEN coincidir con el Enum AppRole.java
 
 INSERT INTO "Rol" ("ID_Rol", "Nombre_Rol") VALUES
 (1, 'ADMIN'),
-(2, 'OPERADOR'),
-(3, 'MONITOR'),
+(2, 'USER'),
+(3, 'ORGANIZADOR'),
 (4, 'INVITADO')
-ON CONFLICT ("ID_Rol") DO NOTHING;
+ON CONFLICT ("ID_Rol") DO UPDATE SET "Nombre_Rol" = EXCLUDED."Nombre_Rol";
+
+-- Ajustar la secuencia de IDs para la tabla Rol para evitar duplicados si se insertan nuevos
+-- Esto es necesario porque insertamos IDs manuales arriba
+SELECT setval(pg_get_serial_sequence('"Rol"', 'ID_Rol'), coalesce(max("ID_Rol"), 1), true) FROM "Rol";
 
 -- =====================================================
 -- 2. Inserción de TIPOS DE EVENTO
@@ -48,16 +53,14 @@ INSERT INTO "Participantes" (
     "Apellido",
     "Email",
     "Password",
-    "Fecha_Creacion",
-    "RolID_Rol"
+    "Fecha_Creacion"
 ) VALUES (
     1000000001,
     'Admin',
     'Sistema',
     'admin@epace.com',
     '$2a$10$slYQmyNdGzTn7ZLBXBChFOC9f6kFjAqPhccnP6DxlWXx2lPk1C3G6', -- admin123
-    CURRENT_TIMESTAMP,
-    1
+    CURRENT_TIMESTAMP
 )
 ON CONFLICT ("Documento_Identidad") DO NOTHING;
 
@@ -66,43 +69,39 @@ ON CONFLICT ("Documento_Identidad") DO NOTHING;
 -- =====================================================
 -- Contraseña para todos: test123
 
--- Operador
+-- USER (Antes Operador)
 INSERT INTO "Participantes" (
     "Documento_Identidad",
     "Nombre",
     "Apellido",
     "Email",
     "Password",
-    "Fecha_Creacion",
-    "RolID_Rol"
+    "Fecha_Creacion"
 ) VALUES (
     1000000002,
-    'Operador',
+    'User',
     'Prueba',
-    'operador@epace.com',
+    'user@epace.com',
     '$2a$10$N.hCNsD2GUr1VsaLECxFUODLF9LNn2xH.P0C6t2LYyU7h3mNGdY1u', -- test123
-    CURRENT_TIMESTAMP,
-    2
+    CURRENT_TIMESTAMP
 )
 ON CONFLICT ("Documento_Identidad") DO NOTHING;
 
--- Monitor
+-- ORGANIZADOR (Antes Monitor)
 INSERT INTO "Participantes" (
     "Documento_Identidad",
     "Nombre",
     "Apellido",
     "Email",
     "Password",
-    "Fecha_Creacion",
-    "RolID_Rol"
+    "Fecha_Creacion"
 ) VALUES (
     1000000003,
-    'Monitor',
+    'Organizador',
     'Prueba',
-    'monitor@epace.com',
+    'organizador@epace.com',
     '$2a$10$N.hCNsD2GUr1VsaLECxFUODLF9LNn2xH.P0C6t2LYyU7h3mNGdY1u', -- test123
-    CURRENT_TIMESTAMP,
-    3
+    CURRENT_TIMESTAMP
 )
 ON CONFLICT ("Documento_Identidad") DO NOTHING;
 
@@ -113,27 +112,37 @@ INSERT INTO "Participantes" (
     "Apellido",
     "Email",
     "Password",
-    "Fecha_Creacion",
-    "RolID_Rol"
+    "Fecha_Creacion"
 ) VALUES (
     1000000004,
     'Invitado',
     'Prueba',
     'invitado@epace.com',
     '$2a$10$N.hCNsD2GUr1VsaLECxFUODLF9LNn2xH.P0C6t2LYyU7h3mNGdY1u', -- test123
-    CURRENT_TIMESTAMP,
-    4
+    CURRENT_TIMESTAMP
 )
 ON CONFLICT ("Documento_Identidad") DO NOTHING;
 
 -- =====================================================
--- 6. Verificación
+-- 6. Asignación de Roles (Tabla Intermedia)
+-- =====================================================
+
+INSERT INTO "Participante_Roles" ("Participante_Documento", "Rol_ID") VALUES
+(1000000001, 1), -- Admin -> ADMIN
+(1000000002, 2), -- User -> USER
+(1000000003, 3), -- Organizador -> ORGANIZADOR
+(1000000004, 4)  -- Invitado -> INVITADO
+ON CONFLICT DO NOTHING;
+
+-- =====================================================
+-- 7. Verificación
 -- =====================================================
 
 SELECT 'Roles creados:' AS info;
 SELECT * FROM "Rol";
 
 SELECT 'Usuarios de prueba creados:' AS info;
-SELECT "Documento_Identidad", "Nombre", "Apellido", "Email", r."Nombre_Rol"
+SELECT p."Documento_Identidad", p."Nombre", p."Email", r."Nombre_Rol"
 FROM "Participantes" p
-JOIN "Rol" r ON p."RolID_Rol" = r."ID_Rol";
+JOIN "Participante_Roles" pr ON p."Documento_Identidad" = pr."Participante_Documento"
+JOIN "Rol" r ON pr."Rol_ID" = r."ID_Rol";

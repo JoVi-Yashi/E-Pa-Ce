@@ -6,13 +6,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificaciones")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class CertificacionController {
 
     @Autowired
@@ -24,7 +24,7 @@ public class CertificacionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CertificacionResponse> getCertificacionById(@PathVariable Integer id) {
+    public ResponseEntity<CertificacionResponse> getCertificacionById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(certificacionService.getCertificacionById(id));
         } catch (RuntimeException e) {
@@ -51,7 +51,7 @@ public class CertificacionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCertificacion(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteCertificacion(@PathVariable @NonNull Integer id) {
         try {
             certificacionService.deleteCertificacion(id);
             return ResponseEntity.noContent().build();
@@ -61,12 +61,12 @@ public class CertificacionController {
     }
 
     @GetMapping("/evento/{eventoId}")
-    public ResponseEntity<List<CertificacionResponse>> getByEvento(@PathVariable Integer eventoId) {
+    public ResponseEntity<List<CertificacionResponse>> getByEvento(@PathVariable @NonNull Integer eventoId) {
         return ResponseEntity.ok(certificacionService.getCertificacionesByEvento(eventoId));
     }
 
     @GetMapping("/participante/{documento}")
-    public ResponseEntity<List<CertificacionResponse>> getByParticipante(@PathVariable Long documento) {
+    public ResponseEntity<List<CertificacionResponse>> getByParticipante(@PathVariable @NonNull Long documento) {
         return ResponseEntity.ok(certificacionService.getCertificacionesByParticipante(documento));
     }
 }

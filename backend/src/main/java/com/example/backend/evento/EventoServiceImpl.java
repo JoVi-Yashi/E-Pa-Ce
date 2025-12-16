@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +50,8 @@ public class EventoServiceImpl implements EventoService {
     public EventoResponse createEvento(EventoRequest eventoRequest) {
         EventoEntity evento = new EventoEntity();
         mapToEntity(evento, eventoRequest);
-        EventoEntity savedEvento = eventoRepository.save(evento);
+        @SuppressWarnings("null")
+        EventoEntity savedEvento = Objects.requireNonNull(eventoRepository.save(evento));
         return mapToResponse(savedEvento);
     }
 
@@ -59,7 +61,8 @@ public class EventoServiceImpl implements EventoService {
         EventoEntity evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + id));
         mapToEntity(evento, eventoRequest);
-        EventoEntity updatedEvento = eventoRepository.save(evento);
+        @SuppressWarnings("null")
+        EventoEntity updatedEvento = Objects.requireNonNull(eventoRepository.save(evento));
         return mapToResponse(updatedEvento);
     }
 
@@ -97,17 +100,19 @@ public class EventoServiceImpl implements EventoService {
         evento.setAforoMaximo(request.getAforoMaximo());
         evento.setEstado(request.getEstado());
 
-        if (request.getModalidadEventoId() != null) {
-            ModalidadEventoEntity modalidad = modalidadEventoRepository.findById(request.getModalidadEventoId())
+        Integer modalidadId = request.getModalidadEventoId();
+        if (modalidadId != null) {
+            ModalidadEventoEntity modalidad = modalidadEventoRepository.findById(modalidadId)
                     .orElseThrow(() -> new RuntimeException(
-                            "Modalidad no encontrada con ID: " + request.getModalidadEventoId()));
+                            "Modalidad no encontrada con ID: " + modalidadId));
             evento.setModalidadEvento(modalidad);
         }
 
-        if (request.getTipoEventoId() != null) {
-            TipoEventoEntity tipo = tipoEventoRepository.findById(request.getTipoEventoId())
+        Integer tipoEventoId = request.getTipoEventoId();
+        if (tipoEventoId != null) {
+            TipoEventoEntity tipo = tipoEventoRepository.findById(tipoEventoId)
                     .orElseThrow(() -> new RuntimeException(
-                            "Tipo de evento no encontrado con ID: " + request.getTipoEventoId()));
+                            "Tipo de evento no encontrado con ID: " + tipoEventoId));
             evento.setTipoEvento(tipo);
         }
     }

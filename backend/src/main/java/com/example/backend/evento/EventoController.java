@@ -6,13 +6,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/eventos")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class EventoController {
 
     @Autowired
@@ -25,7 +25,7 @@ public class EventoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventoResponse> getEventoById(@PathVariable Integer id) {
+    public ResponseEntity<EventoResponse> getEventoById(@PathVariable @NonNull Integer id) {
         try {
             EventoResponse evento = eventoService.getEventoById(id);
             return ResponseEntity.ok(evento);
@@ -45,7 +45,8 @@ public class EventoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEvento(@PathVariable Integer id, @Valid @RequestBody EventoRequest eventoRequest) {
+    public ResponseEntity<?> updateEvento(@PathVariable @NonNull Integer id,
+            @Valid @RequestBody EventoRequest eventoRequest) {
         try {
             EventoResponse updatedEvento = eventoService.updateEvento(id, eventoRequest);
             return ResponseEntity.ok(updatedEvento);
@@ -55,7 +56,7 @@ public class EventoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteEvento(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteEvento(@PathVariable @NonNull Integer id) {
         try {
             eventoService.deleteEvento(id);
             return ResponseEntity.noContent().build();

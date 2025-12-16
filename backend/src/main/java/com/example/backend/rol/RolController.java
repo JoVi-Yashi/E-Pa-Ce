@@ -5,13 +5,12 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
-@CrossOrigin(origins = "*", maxAge = 3600)
 public class RolController {
 
     @Autowired
@@ -23,7 +22,7 @@ public class RolController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RolDTO> getRolById(@PathVariable Integer id) {
+    public ResponseEntity<RolDTO> getRolById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(rolService.getRolById(id));
         } catch (RuntimeException e) {
@@ -37,7 +36,7 @@ public class RolController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RolDTO> updateRol(@PathVariable Integer id, @Valid @RequestBody RolDTO rolDTO) {
+    public ResponseEntity<RolDTO> updateRol(@PathVariable @NonNull Integer id, @Valid @RequestBody RolDTO rolDTO) {
         try {
             return ResponseEntity.ok(rolService.updateRol(id, rolDTO));
         } catch (RuntimeException e) {
@@ -46,7 +45,7 @@ public class RolController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteRol(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteRol(@PathVariable @NonNull Integer id) {
         try {
             rolService.deleteRol(id);
             return ResponseEntity.noContent().build();
