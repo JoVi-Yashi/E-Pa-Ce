@@ -18,4 +18,5 @@ public class CertificacionResponse {
     private Integer participacionId;
     private String participanteNombre;
     private String eventoNombre;
+    private String fotoPerfil;
 }

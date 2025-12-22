@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
@@ -17,40 +18,37 @@ public class RolController {
     private RolService rolService;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ROL:VIEW', 'ROL:MANAGE', 'ALL:ALL')")
     public ResponseEntity<List<RolDTO>> getAllRoles() {
         return ResponseEntity.ok(rolService.getAllRoles());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROL:VIEW', 'ROL:MANAGE', 'ALL:ALL')")
     public ResponseEntity<RolDTO> getRolById(@PathVariable @NonNull Integer id) {
-        try {
-            return ResponseEntity.ok(rolService.getRolById(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(rolService.getRolById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ROL:MANAGE', 'ALL:ALL')")
     public ResponseEntity<RolDTO> createRol(@Valid @RequestBody RolDTO rolDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(rolService.createRol(rolDTO));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROL:MANAGE', 'ALL:ALL')")
     public ResponseEntity<RolDTO> updateRol(@PathVariable @NonNull Integer id, @Valid @RequestBody RolDTO rolDTO) {
-        try {
-            return ResponseEntity.ok(rolService.updateRol(id, rolDTO));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(rolService.updateRol(id, rolDTO));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROL:MANAGE', 'ALL:ALL')")
     public ResponseEntity<?> deleteRol(@PathVariable @NonNull Integer id) {
         try {
             rolService.deleteRol(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

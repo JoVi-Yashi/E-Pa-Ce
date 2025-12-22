@@ -18,4 +18,6 @@ public class AuditoriaResponse {
     private String descripcionCambio;
     private Long participanteDocumento;
     private String participanteNombre;
+    private String participanteFoto;
+    private String rolUsuario;
 }

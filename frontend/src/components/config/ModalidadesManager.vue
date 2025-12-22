@@ -1,73 +1,93 @@
 <template>
-  <div class="config-component">
+  <div class="config-component animate-fade-in">
     <div class="component-header">
-       <h2>Modalidades</h2>
-       <button class="btn-primary" @click="resetForm(); showForm = true">
+       <div class="header-info">
+          <h3>Modalidades</h3>
+          <p class="text-xs text-secondary">Ajusta los formatos de entrega de tus eventos</p>
+       </div>
+       <button v-if="authStore.hasPermission('CONFIGURACION:CREATE') || authStore.hasPermission('CONFIGURACION:MANAGE')" class="btn-primary btn-premium-header" @click="resetForm(); showForm = true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Nueva Modalidad
        </button>
     </div>
 
     <div v-if="loading" class="loading-state">
-      <div class="spinner"></div> Cargando...
+      <LoadingSpinner />
     </div>
-    <div v-if="error" class="error-msg">{{ error }}</div>
+    
+    <div v-if="error" class="error-msg-premium">{{ error }}</div>
 
-    <div class="card" v-if="!loading">
-      <div class="table-responsive">
-        <table class="styled-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nombre Modalidad</th>
-              <th style="text-align: right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="m in modalidades" :key="m.idModalidadEvento">
-              <td>#{{ m.idModalidadEvento }}</td>
-              <td><strong>{{ m.nombreModalidadEvento }}</strong></td>
-              <td style="text-align: right">
-                <button class="icon-btn edit" @click="editModalidad(m)" title="Editar">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+    <div class="table-container-premium" v-if="!loading">
+      <table class="styled-table premium-table">
+        <thead>
+          <tr>
+            <th>Nombre Modalidad</th>
+            <th v-if="authStore.hasPermission('CONFIGURACION:UPDATE_ALL') || authStore.hasPermission('CONFIGURACION:DELETE_ALL') || authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="m in modalidades" :key="m.idModalidadEvento">
+            <td>
+              <div class="name-cell">
+                <div class="name-dot"></div>
+                <strong>{{ m.nombreModalidadEvento }}</strong>
+              </div>
+            </td>
+            <td v-if="authStore.hasPermission('CONFIGURACION:UPDATE_ALL') || authStore.hasPermission('CONFIGURACION:DELETE_ALL') || authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">
+              <div class="action-group">
+                <button v-if="authStore.hasPermission('CONFIGURACION:UPDATE_ALL') || authStore.hasPermission('CONFIGURACION:MANAGE')" class="action-btn edit" @click="editModalidad(m)" title="Editar">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
-                <button class="icon-btn delete" @click="deleteModalidad(m.idModalidadEvento)" title="Eliminar">
-                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                <button v-if="authStore.hasPermission('CONFIGURACION:DELETE_ALL') || authStore.hasPermission('CONFIGURACION:MANAGE')" class="action-btn delete" @click="deleteModalidad(m.idModalidadEvento)" title="Eliminar">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div v-if="modalidades.length === 0" class="empty-state">
-        No hay modalidades registradas.
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div v-if="modalidades.length === 0" class="empty-state-premium">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+        <p>No se encontraron modalidades registradas.</p>
       </div>
     </div>
 
-    <!-- Form Modal -->
-    <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
-      <div class="modal-content animate-slide-up">
-        <div class="modal-header">
-           <h3>{{ form.idModalidadEvento ? 'Editar' : 'Crear' }} Modalidad</h3>
-           <button class="close-btn" @click="showForm = false">&times;</button>
+    <BaseModal
+      :show="showForm"
+      :title="form.idModalidadEvento ? 'Editar Modalidad' : 'Nueva Modalidad'"
+      maxWidth="500px"
+      @close="showForm = false"
+    >
+      <form @submit.prevent="submitForm">
+        <div class="form-group-premium">
+            <label>Nombre de la Modalidad</label>
+            <input v-model="form.nombreModalidadEvento" class="form-control-premium" placeholder="Ej. Presencial, Híbrido, Virtual" required />
+            <small class="form-help">Este nombre aparecerá en la creación de eventos.</small>
         </div>
-        <form @submit.prevent="submitForm" class="modal-body">
-           <div class="form-group">
-               <label>Nombre Modalidad</label>
-               <input v-model="form.nombreModalidadEvento" placeholder="Ej. Presencial, Virtual" required />
-           </div>
-           <div class="modal-footer">
-               <button type="button" class="btn-secondary" @click="showForm = false">Cancelar</button>
-               <button type="submit" class="btn-primary">Guardar</button>
-           </div>
-        </form>
-      </div>
-    </div>
+        <div class="modal-actions-premium">
+            <button type="button" class="btn-outline" @click="showForm = false">Cancelar</button>
+            <button type="submit" class="btn-primary">
+              {{ form.idModalidadEvento ? 'Actualizar' : 'Crear' }} Modalidad
+            </button>
+        </div>
+      </form>
+    </BaseModal>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
 import api from '../../services/api';
+import LoadingSpinner from '../ui/LoadingSpinner.vue';
+import BaseModal from '../modals/BaseModal.vue';
+import { useAuthStore } from '../../stores/auth';
+import { useNotificationStore } from '../../stores/notifications';
+import { useConfirmStore } from '../../stores/confirm';
+
+const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
+const confirmStore = useConfirmStore();
 
 const modalidades = ref([]);
 const loading = ref(false);
@@ -95,75 +115,218 @@ const editModalidad = (m) => {
 };
 
 const deleteModalidad = async (id) => {
-    if(!confirm('¿Eliminar modalidad?')) return;
+    const confirmed = await confirmStore.ask({
+        title: 'Eliminar Modalidad',
+        message: '¿Estás seguro de eliminar esta modalidad?',
+        type: 'danger'
+    });
+    if(!confirmed) return;
     try {
         await api.delete(`/modalidades/${id}`);
+        notificationStore.showSuccess('Modalidad eliminada correctamente');
         fetchModalidades();
-    } catch(err) { alert(err.message); }
+    } catch(err) { 
+        notificationStore.showError('Error eliminando: ' + (err.response?.data?.message || err.message));
+    }
 };
 
 const submitForm = async () => {
     try {
         if (form.value.idModalidadEvento) {
             await api.put(`/modalidades/${form.value.idModalidadEvento}`, form.value);
+            notificationStore.showSuccess('Modalidad actualizada correctamente');
         } else {
             await api.post('/modalidades', form.value);
+            notificationStore.showSuccess('Modalidad creada correctamente');
         }
         showForm.value = false;
         fetchModalidades();
-    } catch (err) { alert(err.message); }
+    } catch (err) { 
+        notificationStore.showError('Error guardando: ' + (err.response?.data?.message || err.message));
+    }
 };
 
 onMounted(fetchModalidades);
 </script>
 
 <style scoped>
+/* Configuration Components Premium Styling */
+.config-component {
+    padding: 0.5rem;
+}
+
 .component-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-info h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+}
+
+.header-info p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+/* Premium Table Styling */
+.table-container-premium {
+    background: #fcfdfe;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+}
+
+.premium-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.premium-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.premium-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+
+.premium-table tr:last-child td {
+    border-bottom: none;
+}
+
+.premium-table tr:hover {
+    background: #f8fbff;
+}
+
+.name-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.name-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Action Group */
+.action-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.action-btn.edit:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #f5f7ff;
+}
+
+.action-btn.delete:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+/* Modal Form Premium Elements */
+.form-group-premium {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     margin-bottom: 1.5rem;
 }
 
-/* Reusing styles from global implicitly, but adding necessary scoped styles */
-.icon-btn {
-  background: transparent;
-  color: #718096;
-  padding: 0.5rem;
-  margin-left: 0.5rem;
-  box-shadow: none;
+.form-group-premium label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
 }
-.icon-btn:hover { background: #f7fafc; transform: translateY(-2px); }
-.icon-btn.edit:hover { color: #667eea; }
-.icon-btn.delete:hover { color: #e53e3e; }
 
-.modal-overlay {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5); display: flex;
-  justify-content: center; align-items: center; z-index: 1000;
-  backdrop-filter: blur(4px);
+.form-control-premium {
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    transition: all 0.2s;
 }
-.modal-content {
-  background: white; border-radius: 16px; width: 90%; max-width: 500px;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+
+.form-control-premium:focus {
+    background: white;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    outline: none;
 }
-.modal-header {
-  padding: 1.5rem; border-bottom: 1px solid #e2e8f0;
-  display: flex; justify-content: space-between; align-items: center;
+
+.form-help {
+    font-size: 0.75rem;
+    color: #94a3b8;
 }
-.modal-body { padding: 1.5rem; }
-.form-group label {
-  display: block; font-size: 0.875rem; font-weight: 600;
-  margin-bottom: 0.5rem; color: #4a5568;
+
+.modal-actions-premium {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 1rem;
 }
-.modal-footer {
-  padding: 1.5rem; border-top: 1px solid #e2e8f0;
-  display: flex; justify-content: flex-end; gap: 1rem;
+
+/* Empty State Premium */
+.empty-state-premium {
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: #94a3b8;
+    text-align: center;
 }
-.btn-secondary {
-  background: white; color: #4a5568; border: 1px solid #cbd5e0;
-}
-.close-btn {
-  background: transparent; color: #a0aec0; font-size: 1.5rem; padding: 0; box-shadow: none;
+
+.error-msg-premium {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-left: 4px solid #ef4444;
 }
 </style>

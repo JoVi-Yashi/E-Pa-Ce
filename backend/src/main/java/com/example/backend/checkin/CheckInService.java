@@ -16,4 +16,10 @@ public interface CheckInService {
     List<CheckInResponse> getCheckInsByEvento(Integer eventoId);
 
     CheckInResponse realizarCheckInPorCodigo(String codigoUnicoAPI, String ipAddress);
+
+    CheckInResponse realizarCheckIn(Long participanteId, Integer eventoId, String ipAddress);
+
+    CheckInResponse realizarCheckOut(Long participanteId, Integer eventoId, String ipAddress);
+
+    List<CheckInResponse> getActiveCheckInsByEvento(Integer eventoId);
 }

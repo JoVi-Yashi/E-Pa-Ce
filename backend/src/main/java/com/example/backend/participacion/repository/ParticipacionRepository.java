@@ -16,44 +16,47 @@ import java.util.Optional;
 @Repository
 public interface ParticipacionRepository extends JpaRepository<ParticipacionEntity, Integer> {
 
-    /**
-     * Busca una participación por el código único.
-     */
-    Optional<ParticipacionEntity> findByCodigoUnicoAPI(String codigoUnicoAPI);
+        /**
+         * Busca una participación por el código único.
+         */
+        Optional<ParticipacionEntity> findByCodigoUnicoAPI(String codigoUnicoAPI);
 
-    /**
-     * Busca todas las participaciones de un evento.
-     */
-    List<ParticipacionEntity> findByEvento_IdEvento(Integer eventoId);
+        Optional<ParticipacionEntity> findByParticipante_DocumentoIdentidadAndEvento_IdEvento(Long documentoIdentidad,
+                        Integer eventoId);
 
-    /**
-     * Busca todas las participaciones de un participante.
-     */
-    List<ParticipacionEntity> findByParticipante_DocumentoIdentidad(Long documentoIdentidad);
+        /**
+         * Busca todas las participaciones de un evento.
+         */
+        List<ParticipacionEntity> findByEvento_IdEvento(Integer eventoId);
 
-    /**
-     * Verifica si un participante ya está inscrito en un evento.
-     */
-    @Query("SELECT COUNT(p) > 0 FROM ParticipacionEntity p WHERE " +
-            "p.participante.documentoIdentidad = :documentoIdentidad AND " +
-            "p.evento.idEvento = :eventoId")
-    Boolean existsByParticipanteAndEvento(@Param("documentoIdentidad") Long documentoIdentidad,
-                                          @Param("eventoId") Integer eventoId);
+        /**
+         * Busca todas las participaciones de un participante.
+         */
+        List<ParticipacionEntity> findByParticipante_DocumentoIdentidad(Long documentoIdentidad);
 
-    /**
-     * Cuenta las inscripciones de un evento.
-     */
-    Long countByEvento_IdEvento(Integer eventoId);
+        /**
+         * Verifica si un participante ya está inscrito en un evento.
+         */
+        @Query("SELECT COUNT(p) > 0 FROM ParticipacionEntity p WHERE " +
+                        "p.participante.documentoIdentidad = :documentoIdentidad AND " +
+                        "p.evento.idEvento = :eventoId")
+        Boolean existsByParticipanteAndEvento(@Param("documentoIdentidad") Long documentoIdentidad,
+                        @Param("eventoId") Integer eventoId);
 
-    /**
-     * Busca participaciones de un evento con check-in realizado.
-     */
-    @Query("SELECT p FROM ParticipacionEntity p WHERE p.evento.idEvento = :eventoId AND p.checkIn IS NOT NULL")
-    List<ParticipacionEntity> findInscritosConCheckIn(@Param("eventoId") Integer eventoId);
+        /**
+         * Cuenta las inscripciones de un evento.
+         */
+        Long countByEvento_IdEvento(Integer eventoId);
 
-    /**
-     * Busca participaciones de un evento sin check-in.
-     */
-    @Query("SELECT p FROM ParticipacionEntity p WHERE p.evento.idEvento = :eventoId AND p.checkIn IS NULL")
-    List<ParticipacionEntity> findInscritosSinCheckIn(@Param("eventoId") Integer eventoId);
+        /**
+         * Busca participaciones de un evento con check-in realizado.
+         */
+        @Query("SELECT p FROM ParticipacionEntity p WHERE p.evento.idEvento = :eventoId AND p.checkIns IS NOT EMPTY")
+        List<ParticipacionEntity> findInscritosConCheckIn(@Param("eventoId") Integer eventoId);
+
+        /**
+         * Busca participaciones de un evento sin check-in.
+         */
+        @Query("SELECT p FROM ParticipacionEntity p WHERE p.evento.idEvento = :eventoId AND p.checkIns IS EMPTY")
+        List<ParticipacionEntity> findInscritosSinCheckIn(@Param("eventoId") Integer eventoId);
 }

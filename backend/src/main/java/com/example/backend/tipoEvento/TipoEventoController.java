@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
@@ -17,11 +18,13 @@ public class TipoEventoController {
     private TipoEventoService tipoEventoService;
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('EVENTO:READ_ALL', 'EVENTO:READ_OWN', 'CONFIGURACION:READ_ALL', 'ALL:ALL')")
     public ResponseEntity<List<TipoEventoDTO>> getAllTiposEvento() {
         return ResponseEntity.ok(tipoEventoService.getAllTiposEvento());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('EVENTO:READ_ALL', 'EVENTO:READ_OWN', 'CONFIGURACION:READ_ALL', 'ALL:ALL')")
     public ResponseEntity<TipoEventoDTO> getTipoEventoById(@PathVariable @NonNull Integer id) {
         try {
             return ResponseEntity.ok(tipoEventoService.getTipoEventoById(id));
@@ -31,11 +34,13 @@ public class TipoEventoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('CONFIGURACION:CREATE', 'CONFIGURACION:MANAGE', 'ALL:ALL')")
     public ResponseEntity<TipoEventoDTO> createTipoEvento(@Valid @RequestBody TipoEventoDTO tipoEventoDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(tipoEventoService.createTipoEvento(tipoEventoDTO));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CONFIGURACION:UPDATE_ALL', 'CONFIGURACION:MANAGE', 'ALL:ALL')")
     public ResponseEntity<TipoEventoDTO> updateTipoEvento(@PathVariable @NonNull Integer id,
             @Valid @RequestBody TipoEventoDTO tipoEventoDTO) {
         try {
@@ -46,6 +51,7 @@ public class TipoEventoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CONFIGURACION:DELETE_ALL', 'CONFIGURACION:MANAGE', 'ALL:ALL')")
     public ResponseEntity<?> deleteTipoEvento(@PathVariable @NonNull Integer id) {
         try {
             tipoEventoService.deleteTipoEvento(id);

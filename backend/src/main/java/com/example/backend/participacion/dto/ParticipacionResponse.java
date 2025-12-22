@@ -17,4 +17,8 @@ public class ParticipacionResponse {
     private Integer eventoId;
     private String eventoNombre;
     private String codigoUnicoAPI;
+    private String metodoInscripcion;
+    private Long registradoPorId;
+    private String registradoPorNombre;
+    private Boolean hasActiveCheckIn; // Indica si tiene check-in activo (entrada sin salida)
 }

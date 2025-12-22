@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Entidad que representa un participante del sistema.
@@ -28,47 +29,55 @@ import java.util.Collection;
 @DynamicInsert
 @DynamicUpdate
 @Entity
-@Table(name = "Participantes", indexes = {
-        @Index(name = "idx_participante_email", columnList = "Email")
-}, uniqueConstraints = {
-        @UniqueConstraint(name = "uk_participante_email", columnNames = "Email")
+@Table(name = "participante", indexes = {
+        @Index(name = "idx_participante_email", columnList = "email")
 })
 @EntityListeners(AuditingEntityListener.class)
 public class ParticipanteEntity implements UserDetails {
 
     @Id
     @NotNull(message = "El documento de identidad es obligatorio")
-    @Column(name = "Documento_Identidad", nullable = false, precision = 15)
+    @Column(name = "documento_identidad", nullable = false)
     private Long documentoIdentidad;
 
     @NotBlank(message = "El nombre es obligatorio")
-    @Size(max = 25, message = "El nombre no puede exceder 25 caracteres")
-    @Column(name = "Nombre", nullable = false, length = 25)
+    @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")
+    @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
 
     @NotBlank(message = "El apellido es obligatorio")
-    @Size(max = 25, message = "El apellido no puede exceder 25 caracteres")
-    @Column(name = "Apellido", nullable = false, length = 25)
+    @Size(max = 50, message = "El apellido no puede exceder 50 caracteres")
+    @Column(name = "apellido", nullable = false, length = 50)
     private String apellido;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe tener un formato válido")
-    @Size(max = 45, message = "El email no puede exceder 45 caracteres")
-    @Column(name = "Email", nullable = false, length = 45, unique = true)
+    @Size(max = 100, message = "El email no puede exceder 100 caracteres")
+    @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(max = 100, message = "La contraseña no puede exceder 100 caracteres")
-    @Column(name = "Password", nullable = false, length = 100)
+    @Size(max = 255, message = "La contraseña no puede exceder 255 caracteres")
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
+    @NotNull
+    @Column(name = "estado", nullable = false, length = 20)
+    private String estado = "HABILITADO"; // HABILITADO, INHABILITADO
+
+    @Column(name = "foto_perfil", columnDefinition = "TEXT")
+    private String fotoPerfil;
+
     @CreationTimestamp
-    @Column(name = "Fecha_Creacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "Participante_Roles", joinColumns = @JoinColumn(name = "Participante_Documento"), inverseJoinColumns = @JoinColumn(name = "Rol_ID"))
+    @JoinTable(name = "participante_rol", joinColumns = @JoinColumn(name = "participante_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private java.util.Set<RolEntity> roles = new java.util.HashSet<>();
+
+    @OneToMany(mappedBy = "participante", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<com.example.backend.participacion.entity.ParticipacionEntity> participaciones = new java.util.ArrayList<>();
 
     public ParticipanteEntity() {
     }
@@ -117,6 +126,23 @@ public class ParticipanteEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return "HABILITADO".equalsIgnoreCase(this.estado);
+    }
+
+    public String getHighestPriorityRole() {
+        if (roles == null || roles.isEmpty())
+            return "INVITADO";
+
+        java.util.List<String> roleNames = roles.stream()
+                .map(RolEntity::getNombreRol)
+                .collect(Collectors.toList());
+
+        if (roleNames.contains("ADMIN"))
+            return "ADMIN";
+        if (roleNames.contains("OPERADOR"))
+            return "OPERADOR";
+        if (roleNames.contains("MONITOR"))
+            return "MONITOR";
+        return "INVITADO";
     }
 }

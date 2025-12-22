@@ -58,7 +58,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/login", "/api/auth/signup", "/api/certificaciones/verificar/**")
+                        .requestMatchers("/api/auth/login", "/api/auth/signup",
+                                "/api/auth/forgot-password", "/api/auth/reset-password",
+                                "/api/certificaciones/verificar/**",
+                                "/api/certificaciones/descargar/**",
+                                "/api/public/stats")
                         .permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated());
@@ -79,6 +83,8 @@ public class SecurityConfig {
                 "http://localhost:4173",
                 "http://localhost:3000",
                 "http://localhost:8081",
+                "https://cerous-riskily-dedra.ngrok-free.dev",
+                "https://*.ngrok-free.dev",
                 "*" // For development convenience, though typically restricted in prod
         ));
 

@@ -1,7 +1,9 @@
 package com.example.backend.rol.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,23 +12,25 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@EqualsAndHashCode(of = "idRol")
 @Entity
-@Table(name = "Rol", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_rol_nombre", columnNames = "Nombre_Rol")
+@Table(name = "rol", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_rol_nombre", columnNames = "nombre_rol")
 })
 public class RolEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_Rol", nullable = false)
+    @Column(name = "id_rol", nullable = false)
     private Integer idRol;
 
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "Rol_Permisos", joinColumns = @JoinColumn(name = "rol_id"))
+    @CollectionTable(name = "rol_permiso", joinColumns = @JoinColumn(name = "rol_id"))
     @Column(name = "permiso")
     private java.util.Set<String> permisos = new java.util.HashSet<>();
 
-    @Column(name = "Nombre_Rol", length = 50, unique = true)
+    @NotBlank(message = "El nombre del rol es obligatorio")
+    @Column(name = "nombre_rol", length = 50, unique = true, nullable = false)
     private String nombreRol;
 
     public RolEntity() {

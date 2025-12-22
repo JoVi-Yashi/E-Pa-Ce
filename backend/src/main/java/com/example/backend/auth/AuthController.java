@@ -16,22 +16,37 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
-            return ResponseEntity.ok(jwtResponse);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-        }
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        JwtResponse jwtResponse = authService.authenticateUser(loginRequest);
+        return ResponseEntity.ok(jwtResponse);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        try {
-            String message = authService.registerUser(signUpRequest);
-            return ResponseEntity.ok(new com.example.backend.shared.dto.MessageResponse(message));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new com.example.backend.shared.dto.MessageResponse(e.getMessage()));
-        }
+    public ResponseEntity<com.example.backend.shared.dto.MessageResponse> registerUser(
+            @Valid @RequestBody SignupRequest signUpRequest) {
+        String message = authService.registerUser(signUpRequest);
+        return ResponseEntity.ok(new com.example.backend.shared.dto.MessageResponse(message));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<com.example.backend.shared.dto.MessageResponse> forgotPassword(
+            @Valid @RequestBody com.example.backend.auth.dto.ForgotPasswordRequest request) {
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity
+                .ok(new com.example.backend.shared.dto.MessageResponse("Se ha enviado un correo de recuperación."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<com.example.backend.shared.dto.MessageResponse> resetPassword(
+            @Valid @RequestBody com.example.backend.auth.dto.ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getEmail(), request.getNewPassword());
+        return ResponseEntity
+                .ok(new com.example.backend.shared.dto.MessageResponse("Contraseña restablecida correctamente."));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<JwtResponse> refreshToken() {
+        System.out.println(">>> CONTROLLER: Received refresh-token request");
+        return ResponseEntity.ok(authService.refreshToken());
     }
 }

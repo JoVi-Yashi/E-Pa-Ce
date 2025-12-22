@@ -1,0 +1,18 @@
+package com.example.backend.auth.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+@Data
+public class ResetPasswordRequest {
+    @NotBlank
+    private String token;
+
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    @Size(min = 6)
+    private String newPassword;
+}

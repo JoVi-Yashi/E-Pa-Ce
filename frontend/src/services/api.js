@@ -1,7 +1,25 @@
 import axios from 'axios';
 
+// Determine Base URL
+let baseURL = import.meta.env.VITE_API_URL;
+
+if (!baseURL) {
+  const hostname = window.location.hostname;
+  // If we are on a local network (e.g., 192.168.x.x) but not localhost, 
+  // try to connect to the backend on the same IP at port 8081
+  if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      // Check if we are potentially on Ngrok (https)
+      if (window.location.protocol === 'https:') {
+          console.warn('Running on HTTPS/Ngrok without VITE_API_URL set. Backend connection might fail if not also exposed.');
+      }
+      baseURL = `http://${hostname}:8081/api`; 
+  } else {
+      baseURL = 'http://localhost:8081/api';
+  }
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8081/api',
+  baseURL: baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,6 +31,11 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    const activeRole = localStorage.getItem('activeRole');
+    if (activeRole) {
+      config.headers['X-Active-Role'] = activeRole;
     }
     return config;
   },

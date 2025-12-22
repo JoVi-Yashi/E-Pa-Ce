@@ -16,4 +16,6 @@ public class CheckInRequest {
     private String ipCheckIn;
 
     private String codigoUnicoAPI; // Opcional, para validar si es por QR
+
+    private String tipoAccion; // "ENTRADA" o "SALIDA"
 }

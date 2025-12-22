@@ -5,8 +5,7 @@
          <h1>Gestión de Modalidades</h1>
       </div>
       <div class="actions">
-        <router-link to="/" class="back-link">Volver</router-link>
-        <button class="btn-primary" @click="resetForm(); showForm = true">
+        <button v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" class="btn-primary" @click="resetForm(); showForm = true">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Crear Modalidad
         </button>
@@ -19,20 +18,26 @@
     <div v-if="error" class="error-msg">{{ error }}</div>
 
     <div class="card" v-if="!loading">
+      <TablePagination 
+        v-if="modalidades.length > 0"
+        :totalItems="modalidades.length" 
+        v-model:itemsPerPage="itemsPerPage" 
+        v-model:currentPage="currentPage" 
+      />
       <div class="table-responsive">
         <table class="styled-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Nombre Modalidad</th>
-              <th style="text-align: right">Acciones</th>
+              <th v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="m in modalidades" :key="m.idModalidadEvento">
+            <tr v-for="m in paginatedModalidades" :key="m.idModalidadEvento">
               <td>#{{ m.idModalidadEvento }}</td>
               <td><strong>{{ m.nombreModalidadEvento }}</strong></td>
-              <td style="text-align: right">
+               <td v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">
                 <button class="icon-btn edit" @click="editModalidad(m)" title="Editar">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
@@ -44,6 +49,13 @@
           </tbody>
         </table>
       </div>
+
+      <TablePagination 
+        v-if="modalidades.length > 0"
+        :totalItems="modalidades.length" 
+        v-model:itemsPerPage="itemsPerPage" 
+        v-model:currentPage="currentPage" 
+      />
       <div v-if="modalidades.length === 0" class="empty-state">
         No hay modalidades registradas.
       </div>
@@ -72,8 +84,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '../services/api';
+import { useAuthStore } from '../stores/auth';
+import { useNotificationStore } from '../stores/notifications';
+import { useConfirmStore } from '../stores/confirm';
+import TablePagination from '../components/ui/TablePagination.vue';
+
+const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
+const confirmStore = useConfirmStore();
 
 const modalidades = ref([]);
 const loading = ref(false);
@@ -81,11 +101,22 @@ const error = ref('');
 const showForm = ref(false);
 const form = ref({ idModalidadEvento: null, nombreModalidadEvento: '' });
 
+// Pagination State
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+const totalPages = computed(() => Math.ceil(modalidades.value.length / itemsPerPage.value));
+const paginatedModalidades = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return modalidades.value.slice(start, start + itemsPerPage.value);
+});
+
 const fetchModalidades = async () => {
   loading.value = true;
   try {
     const res = await api.get('/modalidades');
     modalidades.value = res.data;
+    currentPage.value = 1; // RESET
   } catch (err) {
     error.value = 'Error: ' + err.message;
   } finally {
@@ -101,23 +132,35 @@ const editModalidad = (m) => {
 };
 
 const deleteModalidad = async (id) => {
-    if(!confirm('¿Eliminar modalidad?')) return;
+    const confirmed = await confirmStore.ask({
+        title: 'Eliminar Modalidad',
+        message: '¿Estás seguro de eliminar esta modalidad?',
+        type: 'danger'
+    });
+    if(!confirmed) return;
     try {
         await api.delete(`/modalidades/${id}`);
+        notificationStore.showSuccess('Modalidad eliminada correctamente');
         fetchModalidades();
-    } catch(err) { alert(err.message); }
+    } catch(err) { 
+        notificationStore.showError('Error eliminando: ' + (err.response?.data?.message || err.message));
+    }
 };
 
 const submitForm = async () => {
     try {
         if (form.value.idModalidadEvento) {
             await api.put(`/modalidades/${form.value.idModalidadEvento}`, form.value);
+            notificationStore.showSuccess('Modalidad actualizada correctamente');
         } else {
             await api.post('/modalidades', form.value);
+            notificationStore.showSuccess('Modalidad creada correctamente');
         }
         showForm.value = false;
         fetchModalidades();
-    } catch (err) { alert(err.message); }
+    } catch (err) { 
+        notificationStore.showError('Error guardando: ' + (err.response?.data?.message || err.message));
+    }
 };
 
 onMounted(fetchModalidades);

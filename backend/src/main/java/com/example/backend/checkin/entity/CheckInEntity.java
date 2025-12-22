@@ -15,29 +15,33 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "CheckIn")
+@Table(name = "check_in")
 public class CheckInEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_CheckIn", nullable = false)
+    @Column(name = "id_check_in", nullable = false)
     private Integer idCheckIn;
 
-    @Size(max = 10, message = "El método de check-in no puede exceder 10 caracteres")
-    @Column(name = "Metodo_CheckIn", length = 10)
+    @Size(max = 20)
+    @Column(name = "metodo_check_in", length = 20)
     private String metodoCheckIn;
 
-    @Size(max = 15, message = "La IP de check-in no puede exceder 15 caracteres")
-    @Column(name = "IPCheckIn", length = 15)
+    @Size(max = 45)
+    @Column(name = "ip_check_in", length = 45)
     private String ipCheckIn;
 
     @NotNull(message = "La fecha y hora de check-in es obligatoria")
-    @Column(name = "Fecha_HoraCheckIn", nullable = false)
+    @Column(name = "fecha_hora_check_in", nullable = false)
     private LocalDateTime fechaHoraCheckIn;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_accion", length = 10, nullable = false)
+    private TipoAccion tipoAccion = TipoAccion.ENTRADA;
+
     @NotNull(message = "La participación es obligatoria")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ParticipacionID_Participacion", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participacion_id", nullable = false)
     private ParticipacionEntity participacion;
 
     public CheckInEntity() {

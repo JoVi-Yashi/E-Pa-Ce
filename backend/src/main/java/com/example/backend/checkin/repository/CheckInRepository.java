@@ -18,9 +18,9 @@ import java.util.Optional;
 public interface CheckInRepository extends JpaRepository<CheckInEntity, Integer> {
 
     /**
-     * Busca un check-in por ID de participación.
+     * Busca el último registro de check-in para una participación.
      */
-    Optional<CheckInEntity> findByParticipacion_IdParticipacion(Integer participacionId);
+    Optional<CheckInEntity> findTopByParticipacion_IdParticipacionOrderByFechaHoraCheckInDesc(Integer participacionId);
 
     /**
      * Verifica si existe un check-in para una participación.
@@ -43,7 +43,6 @@ public interface CheckInRepository extends JpaRepository<CheckInEntity, Integer>
      * Busca check-ins por método (QR o MANUAL).
      */
 
-
     @Query("SELECT c FROM CheckInEntity c WHERE c.metodoCheckIn = :metodo")
     List<CheckInEntity> findByMetodoCheckIn(@Param("metodo") String metodo);
 
@@ -52,5 +51,17 @@ public interface CheckInRepository extends JpaRepository<CheckInEntity, Integer>
      */
     @Query("SELECT c FROM CheckInEntity c WHERE c.fechaHoraCheckIn BETWEEN :fechaInicio AND :fechaFin")
     List<CheckInEntity> findCheckInsByFechaRange(@Param("fechaInicio") LocalDateTime fechaInicio,
-                                                 @Param("fechaFin") LocalDateTime fechaFin);
+            @Param("fechaFin") LocalDateTime fechaFin);
+
+    /**
+     * Busca los registros de entrada (ENTRADA) que NO tienen una salida (SALIDA)
+     * posterior para ese evento.
+     * Simplificado: Obtenemos los últimos check-ins de cada participación y
+     * filtramos los que son ENTRADA.
+     */
+    @Query("SELECT c FROM CheckInEntity c WHERE c.participacion.evento.idEvento = :eventoId " +
+            "AND c.fechaHoraCheckIn = (SELECT MAX(c2.fechaHoraCheckIn) FROM CheckInEntity c2 WHERE c2.participacion.idParticipacion = c.participacion.idParticipacion) "
+            +
+            "AND c.tipoAccion = com.example.backend.checkin.entity.TipoAccion.ENTRADA")
+    List<CheckInEntity> findActiveCheckInsByEvento(@Param("eventoId") Integer eventoId);
 }

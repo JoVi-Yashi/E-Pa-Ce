@@ -18,6 +18,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    allowedHosts: ['cerous-riskily-dedra.ngrok-free.dev'],
     watch: {
         usePolling: true
     }

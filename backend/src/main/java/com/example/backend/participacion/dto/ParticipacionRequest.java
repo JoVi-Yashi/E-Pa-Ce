@@ -10,4 +10,6 @@ public class ParticipacionRequest {
 
     @NotNull(message = "El documento del participante es obligatorio")
     private Long participanteDocumento;
+
+    private String metodoInscripcion;
 }

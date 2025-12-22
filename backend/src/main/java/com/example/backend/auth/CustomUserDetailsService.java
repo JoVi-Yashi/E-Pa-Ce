@@ -15,7 +15,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @org.springframework.transaction.annotation.Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return participanteRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + email));
+        String cleanEmail = email != null ? email.toLowerCase() : null;
+        return participanteRepository.findByEmail(cleanEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + cleanEmail));
     }
 }

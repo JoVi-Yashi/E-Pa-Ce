@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import com.example.backend.validation.NoSqlInjection;
 
 @Data
 public class SignupRequest {
@@ -13,15 +14,18 @@ public class SignupRequest {
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 25)
+    @NoSqlInjection
     private String nombre;
 
     @NotBlank(message = "El apellido es obligatorio")
     @Size(max = 25)
+    @NoSqlInjection
     private String apellido;
 
     @NotBlank
     @Email
     @Size(max = 45)
+    @NoSqlInjection
     private String email;
 
     @NotBlank

@@ -17,4 +17,8 @@ public class CheckInResponse {
     private Integer participacionId;
     private String participanteNombre;
     private String eventoNombre;
+    private Integer eventoId;
+    private Long participanteId;
+    private String tipoAccion;
+    private String fotoPerfil;
 }

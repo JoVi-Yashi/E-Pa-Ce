@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -15,39 +17,42 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "Auditoria")
+@Table(name = "auditoria")
 public class AuditoriaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_Auditoria", nullable = false)
+    @Column(name = "id_auditoria", nullable = false)
     private Integer idAuditoria;
 
     @NotNull(message = "La fecha y hora es obligatoria")
-    @Column(name = "Fecha_Hora", nullable = false)
+    @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;
 
-    @Size(max = 15, message = "La IP de origen no puede exceder 15 caracteres")
-    @Column(name = "IP_Origen", length = 15)
+    @Size(max = 45, message = "La IP de origen no puede exceder 45 caracteres")
+    @Column(name = "ip_origen", length = 45)
     private String ipOrigen;
 
-    @Size(max = 20, message = "La entidad afectada no puede exceder 20 caracteres")
-    @Column(name = "Entidad_Afectada", length = 20)
+    @Size(max = 50, message = "La entidad afectada no puede exceder 50 caracteres")
+    @Column(name = "entidad_afectada", length = 50)
     private String entidadAfectada;
 
-    @Size(max = 20, message = "La acción no puede exceder 20 caracteres")
-    @Column(name = "Accion", length = 20)
+    @Size(max = 50, message = "La acción no puede exceder 50 caracteres")
+    @Column(name = "accion", length = 50)
     private String accion;
 
-    @Size(max = 100, message = "La descripción del cambio no puede exceder 100 caracteres")
-    @Column(name = "Descripcion_Cambio", length = 100)
+    @Column(name = "descripcion_cambio", columnDefinition = "TEXT")
     private String descripcionCambio;
 
+    @Size(max = 50)
+    @Column(name = "rol_usuario", length = 50)
+    private String rolUsuario;
+
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ParticipanteDocumento_Identidad")
+    @JoinColumn(name = "participante_id", referencedColumnName = "documento_identidad")
     private ParticipanteEntity participante;
 
     public AuditoriaEntity() {
     }
 }
-

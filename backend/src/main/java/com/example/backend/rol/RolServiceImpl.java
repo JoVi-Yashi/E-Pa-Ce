@@ -49,7 +49,14 @@ public class RolServiceImpl implements RolService {
         RolEntity rol = rolRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado con ID: " + id));
         rol.setNombreRol(rolDTO.getNombreRol());
-        rol.setPermisos(rolDTO.getPermisos());
+
+        // Ensure the collection is cleared and re-populated to trigger Hibernate dirty
+        // checking correctly
+        rol.getPermisos().clear();
+        if (rolDTO.getPermisos() != null) {
+            rol.getPermisos().addAll(rolDTO.getPermisos());
+        }
+
         RolEntity updated = rolRepository.save(rol);
         return mapToDTO(updated);
     }
@@ -60,7 +67,11 @@ public class RolServiceImpl implements RolService {
         if (!rolRepository.existsById(id)) {
             throw new RuntimeException("Rol no encontrado con ID: " + id);
         }
-        rolRepository.deleteById(id);
+        try {
+            rolRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el rol porque está asignado a uno o más usuarios.");
+        }
     }
 
     private RolDTO mapToDTO(RolEntity entity) {

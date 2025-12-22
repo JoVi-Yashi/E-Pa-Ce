@@ -17,14 +17,22 @@ public class AuditoriaController {
     private AuditoriaService auditoriaService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MONITOR')") // Ejemplo de seguridad
+    @PreAuthorize("hasAnyAuthority('AUDITORIA:VIEW', 'ALL:ALL')")
     public ResponseEntity<List<AuditoriaResponse>> getAllLogs() {
         return ResponseEntity.ok(auditoriaService.getAllLogs());
     }
 
     @GetMapping("/participante/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('AUDITORIA:VIEW', 'ALL:ALL')")
     public ResponseEntity<List<AuditoriaResponse>> getLogsByParticipante(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(auditoriaService.getLogsByParticipante(id));
+    }
+
+    @PostMapping("/log-role-switch")
+    public ResponseEntity<Void> logRoleSwitch(@RequestBody java.util.Map<String, String> data) {
+        String from = data.get("from");
+        String to = data.get("to");
+        auditoriaService.registrarActividad("AUTH", "UPDATE", "Cambio de rol activo: " + from + " -> " + to);
+        return ResponseEntity.ok().build();
     }
 }

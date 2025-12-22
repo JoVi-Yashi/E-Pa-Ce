@@ -1,6 +1,5 @@
 package com.example.backend.participacion.entity;
 
-
 import com.example.backend.checkin.entity.CheckInEntity;
 import com.example.backend.evento.entity.EventoEntity;
 import com.example.backend.auth.entity.ParticipanteEntity;
@@ -18,35 +17,48 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "Participacion")
+@Table(name = "participacion", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_participacion_evento_participante", columnNames = { "participante_id",
+                "evento_id" })
+})
 public class ParticipacionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_Participacion", nullable = false)
+    @Column(name = "id_participacion", nullable = false)
     private Integer idParticipacion;
 
     @NotNull(message = "La fecha de inscripción es obligatoria")
-    @Column(name = "Fecha_Inscripcion", nullable = false)
+    @Column(name = "fecha_inscripcion", nullable = false)
     private LocalDateTime fechaInscripcion;
 
     @NotNull(message = "El participante es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ParticipanteDocumento_Identidad", nullable = false)
+    @JoinColumn(name = "participante_id", nullable = false)
     private ParticipanteEntity participante;
 
-    @Size(max = 40, message = "El código único API no puede exceder 40 caracteres")
-    @Column(name = "Codigo_UnicoAPI", length = 40)
+    @Size(max = 100, message = "El código único API no puede exceder 100 caracteres")
+    @Column(name = "codigo_unico_api", length = 100, unique = true)
     private String codigoUnicoAPI;
 
     @NotNull(message = "El evento es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EventoID_Evento", nullable = false)
+    @JoinColumn(name = "evento_id", nullable = false)
     private EventoEntity evento;
 
-    @OneToOne(mappedBy = "participacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private CheckInEntity checkIn;
+    @OneToMany(mappedBy = "participacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.List<CheckInEntity> checkIns = new java.util.ArrayList<>();
 
+    @OneToOne(mappedBy = "participacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private com.example.backend.certificacion.entity.CertificacionEntity certificacion;
+
+    @Size(max = 20, message = "El método de inscripción no puede exceder 20 caracteres")
+    @Column(name = "metodo_inscripcion", length = 20)
+    private String metodoInscripcion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registrado_por")
+    private ParticipanteEntity registradoPor;
 
     public ParticipacionEntity() {
     }

@@ -17,50 +17,54 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "Eventos")
+@Table(name = "evento")
 public class EventoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_Evento", nullable = false)
+    @Column(name = "id_evento", nullable = false)
     private Integer idEvento;
 
     @NotBlank(message = "El nombre del evento es obligatorio")
-    @Size(max = 30, message = "El nombre del evento no puede exceder 30 caracteres")
-    @Column(name = "Nombre", nullable = false, length = 30)
+    @Size(max = 100, message = "El nombre del evento no puede exceder 100 caracteres")
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Size(max = 150, message = "La descripción no puede exceder 150 caracteres")
-    @Column(name = "Descripcion", length = 150)
+    @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
-    @Column(name = "Fecha_Inicio", nullable = false)
+    @Column(name = "fecha_inicio", nullable = false)
     private LocalDateTime fechaInicio;
 
     @NotNull(message = "La fecha de fin es obligatoria")
-    @Column(name = "Fecha_Fin", nullable = false)
+    @Column(name = "fecha_fin", nullable = false)
     private LocalDateTime fechaFin;
 
-    @Column(name = "Duracion_Horas")
+    @Column(name = "duracion_horas")
     private Float duracionHoras;
 
-    @Column(name = "Aforo_Maximo")
+    @Column(name = "aforo_maximo")
     private Integer aforoMaximo;
 
-    @Size(max = 10, message = "El estado no puede exceder 10 caracteres")
-    @Column(name = "Estado", length = 10)
-    private String estado;
+    @Column(name = "aforo_actual")
+    private Integer aforoActual = 0;
+
+    @Size(max = 20)
+    @Column(name = "estado", length = 20)
+    private String estado = "BORRADOR";
 
     @NotNull(message = "La modalidad es obligatoria")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Modalidad_EventoID_ModalidadEvento", nullable = false)
+    @JoinColumn(name = "modalidad_evento_id", nullable = false)
     private ModalidadEventoEntity modalidadEvento;
 
     @NotNull(message = "El tipo de evento es obligatorio")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "Tipo_EventoID_TipoEvento", nullable = false)
+    @JoinColumn(name = "tipo_evento_id", nullable = false)
     private TipoEventoEntity tipoEvento;
 
-
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creado_por")
+    private com.example.backend.auth.entity.ParticipanteEntity creadoPor;
+}

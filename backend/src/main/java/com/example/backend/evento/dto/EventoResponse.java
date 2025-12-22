@@ -17,9 +17,12 @@ public class EventoResponse {
     private LocalDateTime fechaFin;
     private Float duracionHoras;
     private Integer aforoMaximo;
+    private Integer aforoActual;
     private String estado;
     private Integer modalidadEventoId;
     private String modalidadEventoNombre;
     private Integer tipoEventoId;
     private String tipoEventoNombre;
+    private Long creadoPorId;
+    private String creadoPorNombre;
 }

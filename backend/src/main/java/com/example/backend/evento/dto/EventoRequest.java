@@ -7,13 +7,17 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import com.example.backend.validation.NoSqlInjection;
+
 @Data
 public class EventoRequest {
     @NotBlank(message = "El nombre del evento es obligatorio")
     @Size(max = 30)
+    @NoSqlInjection
     private String nombre;
 
     @Size(max = 150)
+    @NoSqlInjection
     private String descripcion;
 
     @NotNull(message = "La fecha de inicio es obligatoria")
@@ -27,6 +31,7 @@ public class EventoRequest {
     private Integer aforoMaximo;
 
     @Size(max = 10)
+    @NoSqlInjection
     private String estado;
 
     @NotNull(message = "La modalidad es obligatoria")

@@ -5,9 +5,8 @@
          <h1>Gestión de Tipos de Evento</h1>
       </div>
       <div class="actions">
-        <router-link to="/" class="back-link">Volver</router-link>
-        <button class="btn-primary" @click="resetForm(); showForm = true">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><path d="M12 5v14M5 12h14"/></svg>
+        <button v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" class="btn-primary" @click="resetForm(); showForm = true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Crear Tipo
         </button>
       </div>
@@ -19,20 +18,26 @@
     <div v-if="error" class="error-msg">{{ error }}</div>
 
     <div class="card" v-if="!loading">
+      <TablePagination 
+        v-if="tipos.length > 0"
+        :totalItems="tipos.length" 
+        v-model:itemsPerPage="itemsPerPage" 
+        v-model:currentPage="currentPage" 
+      />
       <div class="table-responsive">
         <table class="styled-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Nombre Tipo</th>
-              <th style="text-align: right">Acciones</th>
+              <th v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="t in tipos" :key="t.idTipoEvento">
+            <tr v-for="t in paginatedTipos" :key="t.idTipoEvento">
               <td>#{{ t.idTipoEvento }}</td>
               <td><strong>{{ t.nombreTipoEvento }}</strong></td>
-              <td style="text-align: right">
+              <td v-if="authStore.hasPermission('CONFIGURACION:MANAGE')" style="text-align: right">
                 <button class="icon-btn edit" @click="editTipo(t)" title="Editar">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 </button>
@@ -44,6 +49,13 @@
           </tbody>
         </table>
       </div>
+
+      <TablePagination 
+        v-if="tipos.length > 0"
+        :totalItems="tipos.length" 
+        v-model:itemsPerPage="itemsPerPage" 
+        v-model:currentPage="currentPage" 
+      />
       <div v-if="tipos.length === 0" class="empty-state">
         No hay tipos registrados.
       </div>
@@ -72,8 +84,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '../services/api';
+import { useAuthStore } from '../stores/auth';
+import { useNotificationStore } from '../stores/notifications';
+import { useConfirmStore } from '../stores/confirm';
+import TablePagination from '../components/ui/TablePagination.vue';
+
+const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
+const confirmStore = useConfirmStore();
 
 const tipos = ref([]);
 const loading = ref(false);
@@ -81,11 +101,22 @@ const error = ref('');
 const showForm = ref(false);
 const form = ref({ idTipoEvento: null, nombreTipoEvento: '' });
 
+// Pagination State
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+
+const totalPages = computed(() => Math.ceil(tipos.value.length / itemsPerPage.value));
+const paginatedTipos = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  return tipos.value.slice(start, start + itemsPerPage.value);
+});
+
 const fetchTipos = async () => {
   loading.value = true;
   try {
     const res = await api.get('/tipos-evento');
     tipos.value = res.data;
+    currentPage.value = 1; // RESET
   } catch (err) {
     error.value = 'Error al cargar tipos: ' + err.message;
   } finally {
@@ -103,12 +134,18 @@ const editTipo = (t) => {
 };
 
 const deleteTipo = async (id) => {
-  if (!confirm('Eliminar seguro?')) return;
+  const confirmed = await confirmStore.ask({
+      title: 'Eliminar Tipo de Evento',
+      message: '¿Estás seguro de eliminar este tipo de evento?',
+      type: 'danger'
+  });
+  if (!confirmed) return;
   try {
     await api.delete(`/tipos-evento/${id}`);
+    notificationStore.showSuccess('Tipo de evento eliminado correctamente');
     fetchTipos();
   } catch (err) {
-    alert(err.message);
+    notificationStore.showError('Error eliminando: ' + (err.response?.data?.message || err.message));
   }
 };
 
@@ -116,13 +153,15 @@ const submitForm = async () => {
   try {
     if (form.value.idTipoEvento) {
       await api.put(`/tipos-evento/${form.value.idTipoEvento}`, form.value);
+      notificationStore.showSuccess('Tipo actualizado correctamente');
     } else {
       await api.post('/tipos-evento', form.value);
+      notificationStore.showSuccess('Tipo creado correctamente');
     }
     showForm.value = false;
     fetchTipos();
   } catch (err) {
-    alert(err.message);
+    notificationStore.showError('Error guardando: ' + (err.response?.data?.message || err.message));
   }
 };
 
